@@ -59,17 +59,18 @@ export default {
     // Get user info from helper
     infoPromise = new Promise(async (resolve) => {
       const infoResolver = infoResolversByType[type];
-      if (infoResolver) {
-        try {
-          const userInfo = await infoResolver(sub);
-          this.addInfo(userInfo);
-          resolve(userInfo);
-        } catch (err) {
-          if (err && err.message === 'RETRY') {
-            infoPromisesByUserId[userId] = null;
-          }
-          resolve({});
+      if (!infoResolver) {
+        resolve({});
+      }
+      try {
+        const userInfo = await infoResolver(sub);
+        this.addInfo(userInfo);
+        resolve(userInfo);
+      } catch (err) {
+        if (err && err.message === 'RETRY') {
+          infoPromisesByUserId[userId] = null;
         }
+        resolve({});
       }
     });
 
